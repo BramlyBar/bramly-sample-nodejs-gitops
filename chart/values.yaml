@@ -1,0 +1,42 @@
+# ------------------------------------------------------------------------------
+# bramly-sample-nodejs Helm Values
+# ------------------------------------------------------------------------------
+# This file holds the default values used by the templates in the chart.
+# You can change these values without having to touch the Kubernetes templates.
+
+# 1. Scaling: Number of pod replicas to run
+# Since our Node.js app is stateless, we can easily scale up or down.
+replicaCount: 1
+
+# 2. Container Image Configuration
+image:
+  repository: ghcr.io/bramlybar/bramly-sample-nodejs
+  pullPolicy: IfNotPresent
+  # The tag is updated automatically by our CI/CD pipeline with the Git commit SHA
+  tag: "latest"
+
+# 3. Service Configuration (Internal cluster networking)
+service:
+  type: ClusterIP
+  port: 8080
+
+# 4. Ingress Configuration (External access to the application)
+ingress:
+  host: bramly-sample-nodejs.local
+  path: /
+
+# 5. Resource Management: Requests (Guaranteed minimum) & Limits (Safety ceiling)
+# - Requests: Guarantees the pod gets at least this much CPU/RAM to start.
+# - Limits: Prevents a memory leak or bug from consuming all node resources.
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+# 6. Application Configuration (Injected into ConfigMap)
+# Injects the PORT environment variable so we don't hardcode it in Dockerfile.
+config:
+  PORT: "8080"

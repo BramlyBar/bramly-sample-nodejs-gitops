@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bramly-sample-nodejs-config
+  labels:
+    app: bramly-sample-nodejs
+data:
+  # Decouples environment configuration from Docker image and application code.
+  # If we need to change the port tomorrow, we just update this ConfigMap.
+  PORT: {{ .Values.config.PORT | quote }}

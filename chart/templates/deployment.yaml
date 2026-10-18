@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bramly-sample-nodejs
+  labels:
+    app: bramly-sample-nodejs
+spec:
+  # Deployments are chosen over StatefulSets because bramly-sample-nodejs is a stateless web app.
+  # Pods can be created, destroyed, or scaled with zero downtime and without data loss.
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: bramly-sample-nodejs
+  template:
+    metadata:
+      labels:
+        app: bramly-sample-nodejs
+    spec:
+      containers:
+        - name: bramly-sample-nodejs
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+
+          # Inject environment variables from ConfigMap (e.g. PORT)
+          envFrom:
+            - configMapRef:
+                name: bramly-sample-nodejs-config
+
+          # Liveness Probe: Checks if the Node.js process is alive.
+          # If this fails (e.g., event loop frozen), Kubernetes restarts the pod.
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Readiness Probe: Checks if the app is ready to serve traffic.
+          # During startup, traffic will NOT be sent here until /ready responds 200 OK.
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Resource Management: Prevents "noisy neighbor" problems and out-of-memory crashes.
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
