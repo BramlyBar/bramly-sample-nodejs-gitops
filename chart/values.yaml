@@ -13,7 +13,7 @@ image:
   repository: ghcr.io/bramlybar/bramly-sample-nodejs
   pullPolicy: IfNotPresent
   # The tag is updated automatically by our CI/CD pipeline with the Git commit SHA
-  tag: "latest"
+  tag: "sha-e9635e862e74712c801daac6efec084358d0ae50"
 
 # 3. Service Configuration (Internal cluster networking)
 service:
