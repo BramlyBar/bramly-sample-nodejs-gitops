@@ -5,6 +5,8 @@ metadata:
   labels:
     app: bramly-sample-nodejs
 spec:
+  # Needed so NGINX controller won't ignore the Ingress and allow browser access
+  ingressClassName: nginx
   # Ingress acts as the entry point from outside the cluster, routing HTTP requests
   # arriving at 'bramly-sample-nodejs.local' down to our internal ClusterIP Service on port 8080.
   rules:
